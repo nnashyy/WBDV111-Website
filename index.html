@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Babies Baby Products Trading</title>
+    <link rel="stylesheet" href="mainstyle.css">
+    <link rel="stylesheet" href="common.css">
+    <link href="https://fonts.googleapis.com/css2?family=Bubblegum+Sans&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <header>
+        <div class="top-bar"></div>
+        <nav class="navbar">
+            <div class="logo-container">
+                <div class="logo">
+                    <a href="index.html">Babies <span>Baby Products Trading</span></a>
+                </div>
+            </div>
+    
+            <div class="nav-links-container">
+                <ul class="nav-links">
+                    <li><a href="index.html" class="active">Home</a></li>
+                    <li><a href="pages.html">About</a></li>
+                    <li><a href="shop.html">Shop</a></li>
+                </ul>
+            </div>
+    
+            <div class="nav-buttons-container">
+                <div class="nav-buttons">
+                    <button class="nav-auth-btn" onclick="window.location.href='shop.html'">Browse Collection</button>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="hero">
+        <div class="hero-image">
+            <img src="images/baby-image.png" alt="Baby Image">
+        </div>
+        <div class="hero-content">
+            <div class="text-container">
+                <img src="images/bird-icon.png" alt="Bird Icon" class="bird-icon">
+                <div class="blue-box">Modern Essentials</div>
+                <div class="yellow-box">For Little Ones</div>
+            </div>
+        </div>
+        <div class="hero-circles">
+            <div class="circle circle1"></div>
+            <div class="circle circle2"></div>
+            <div class="circle circle3"></div>
+            <div class="circle circle4"></div>
+            <div class="circle circle5"></div>
+            <div class="circle circle6"></div>
+            <div class="circle circle7"></div>
+        </div>
+    </div>
+    
+    <div id="bagSidebar" class="sidebar">
+        <div class="sidebar-header">
+            <h2>My Cart</h2>
+            <button class="close-btn" onclick="closeBag()">✖</button>
+        </div>
+        <div class="sidebar-content">
+            <p>Your cart is empty.</p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

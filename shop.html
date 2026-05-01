@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop - Babies Baby Products Trading</title>
+    <link rel="stylesheet" href="shopstyle.css">
+    <link rel="stylesheet" href="common.css">
+    <link href="https://fonts.googleapis.com/css2?family=Bubblegum+Sans&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <header>
+        <div class="top-bar"></div>
+
+        <nav class="navbar">
+            <div class="logo-container">
+                <div class="logo">
+                    <a href="index.html">Babies <span>Baby Products Trading</span></a>
+                </div>
+            </div>
+            
+            <div class="nav-links-container">
+                <ul class="nav-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="pages.html">About</a></li>
+                    <li><a href="shop.html" class="active">Shop</a></li>
+                </ul>
+            </div>
+            
+            <div class="nav-buttons-container">
+                <div class="nav-buttons">
+                    <button id="login-btn-nav" class="nav-auth-btn" onclick="window.location.href='login.html'"><span>🔑</span> Login / Sign Up</button>
+                    
+                    <div id="account-dropdown" class="account-dropdown" style="display: none;">
+                        <button class="account-btn" type="button" onclick="toggleAccountMenu()"><span>👤</span> My Account</button>
+                        <div class="account-menu" id="account-menu">
+                            <button type="button" class="account-menu-item" onclick="openOrdersModal()">My Orders</button>
+                            <button type="button" class="account-menu-item" onclick="logout()">Logout</button>
+                        </div>
+                    </div>
+                    
+                    <button class="my-bag" onclick="openBag()"><span>🛒</span> Cart</button>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="shop-banner">
+        <h1>Our Collection</h1>
+    </div>
+
+    <div class="product-grid">
+        <div class="product" data-name="Baby Pillow and Bolster (Blue)" data-description="A soft, hypoallergenic pillow and bolster set designed to provide optimal comfort and support for your baby's delicate head and body." data-sizes="9 x 13 inches">
+            <img src="images/boy-product1.png" alt="Baby Pillow Blue">
+            <p>Baby Pillow and Bolster (Blue)</p>
+            <p class="product-price">₱120.00</p>
+        </div>
+        <div class="product" data-name="Baby Pillow and Bolster (Pink)" data-description="Ensure your little one has the sweetest dreams with this cozy pink pillow and bolster set. Made with breathable, baby-safe cotton." data-sizes="9 x 13 inches">
+            <img src="images/girl-product1.png" alt="Baby Pillow Pink">
+            <p>Baby Pillow and Bolster (Pink)</p>
+            <p class="product-price">₱120.00</p>
+        </div>
+        <div class="product" data-name="Printed Baby Mattress (Blue)" data-description="A lightweight and highly comfortable printed baby mattress. Features adorable patterns and a washable cover for easy cleaning." data-sizes="24 x 36 inches">
+            <img src="images/boy-product2.png" alt="Printed Mattress Blue">
+            <p>Printed Baby Mattress (Blue)</p>
+            <p class="product-price">₱250.00</p>
+        </div>
+        <div class="product" data-name="Printed Baby Mattress (Pink)" data-description="This beautifully printed pink mattress provides a supportive sleeping surface for your baby, perfect for cribs or travel." data-sizes="24 x 36 inches">
+            <img src="images/girl-product2.png" alt="Printed Mattress Pink">
+            <p>Printed Baby Mattress (Pink)</p>
+            <p class="product-price">₱250.00</p>
+        </div>
+        <div class="product" data-name="Blue Baby Mattress" data-description="A premium, solid blue baby mattress offering firm support to keep your baby safe and comfortable throughout the night." data-sizes="28 x 52 inches (Crib Size)">
+            <img src="images/boy-product5.png" alt="Blue Mattress">
+            <p>Blue Baby Mattress</p>
+            <p class="product-price">₱400.00</p>
+        </div>
+        <div class="product" data-name="Pink Baby Mattress" data-description="A lovely, soft pink mattress designed for gentle comfort and restful sleep. Features reinforced edges and breathable fabric." data-sizes="22 x 34 inches">
+            <img src="images/girl-product4.png" alt="Pink Mattress">
+            <p>Pink Baby Mattress</p>
+            <p class="product-price">₱170.00</p>
+        </div>
+    </div>
+
+    <div id="bagSidebar" class="sidebar">
+        <div class="sidebar-header">
+            <h2>My Cart</h2>
+            <button class="close-btn" onclick="closeBag()">✖</button>
+        </div>
+        <div class="sidebar-content">
+            <ul id="cart-items"></ul>
+            <p id="empty-cart">Your cart is empty.</p>
+        </div>
+        <button id="empty-cart-btn" class="empty-cart-btn">Empty Cart</button>
+        <button id="checkout-button" class="checkout-btn">Checkout</button>
+    </div>
+
+    <div id="productModal" class="modal">
+        <div class="modal-content product-modal-content">
+            <span class="close-modal close-product-modal">&times;</span>
+            <div class="product-details-container">
+                <img id="modal-product-image" src="" alt="Product Image">
+                <div class="product-info">
+                    <h2 id="modal-product-title">Product Name</h2>
+                    <p id="modal-product-price" class="product-price">₱0.00</p>
+                    <div class="product-description" id="modal-product-description">Description goes here...</div>
+                    <div class="product-sizes"><strong>Available Size:</strong> <span id="modal-product-sizes">Standard</span></div>
+                    <button id="modal-add-to-cart" class="add-to-cart-modal">Add to Cart</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="ordersModal" class="modal">
+        <div class="modal-content orders-modal-content">
+            <span class="close-modal" onclick="closeOrdersModal()">&times;</span>
+            <div class="orders-modal-header">
+                <h2>My Orders</h2>
+            </div>
+            
+            <div style="background: var(--surface); padding: 20px; border-radius: 16px; margin-bottom: 25px; border: 1px solid var(--border-soft);">
+                <h3 style="margin-bottom: 15px; font-size: 1.1rem; color: var(--dark-blue);">Track an Order</h3>
+                <form id="inline-tracking-form" onsubmit="simulateInlineTracking(event)" style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <input type="text" id="inlineOrderId" placeholder="Order ID (e.g. BBPT-12345)" required style="flex: 1; min-width: 200px; padding: 12px; border: 1px solid var(--border-soft); border-radius: 8px; box-shadow: inset 0 1px 2px rgba(0,0,0,0.03);">
+                    <button type="submit" class="place-order-btn" style="padding: 12px 24px; border: none; font-size: 14px; cursor: pointer;">Track Status</button>
+                </form>
+                <div id="inline-tracking-result" style="display: none; margin-top: 25px; text-align: center;"></div>
+            </div>
+
+            <div id="orders-list" class="orders-list"></div>
+        </div>
+    </div>
+
+    <footer class="site-footer">
+        <h3>Babies Baby Products Trading</h3>
+        <p>Every piece in our collection is chosen to balance comfort, quality, and everyday ease.</p>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+        function simulateInlineTracking(event) {
+            event.preventDefault();
+            const orderId = document.getElementById('inlineOrderId').value;
+            const resultDiv = document.getElementById('inline-tracking-result');
+
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '<p style="color: var(--text-muted);">Fetching live status...</p>';
+
+            setTimeout(() => {
+                resultDiv.innerHTML = `
+                    <h4 style="color: var(--dark-blue); margin-bottom: 20px;">Status for: <strong>${orderId}</strong></h4>
+                    <div class="tracking-timeline">
+                        <div class="step active">
+                            <div class="step-icon">📋</div>
+                            <p>Placed</p>
+                        </div>
+                        <div class="step active">
+                            <div class="step-icon">📦</div>
+                            <p>Packed</p>
+                        </div>
+                        <div class="step">
+                            <div class="step-icon">🚚</div>
+                            <p>Shipped</p>
+                        </div>
+                        <div class="step">
+                            <div class="step-icon">🏠</div>
+                            <p>Arrived</p>
+                        </div>
+                    </div>
+                `;
+            }, 800); 
+        }
+
+        function copyOrderId(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                const toast = document.getElementById('toast');
+                toast.textContent = "Order ID Copied!";
+                toast.classList.add('show');
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                    setTimeout(() => toast.textContent = "Item added to cart!", 300);
+                }, 3000);
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+            });
+        }
+    </script>
+    <div id="toast" class="toast">Item added to cart!</div>
+</body>
+</html>

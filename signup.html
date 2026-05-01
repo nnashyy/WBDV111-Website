@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - Babies Baby Products Trading</title>
+    <link rel="stylesheet" href="loginstyle.css">
+    <link rel="stylesheet" href="common.css">
+    <link href="https://fonts.googleapis.com/css2?family=Bubblegum+Sans&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <div class="top-bar"></div>
+        <nav class="navbar">
+            <div class="logo-container">
+                <div class="logo">
+                    <a href="index.html">Babies <span>Baby Products Trading</span></a>
+                </div>
+            </div>
+            
+            <div class="nav-links-container">
+                <ul class="nav-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="pages.html">About</a></li>
+                    <li><a href="shop.html">Shop</a></li>
+                </ul>
+            </div>
+            
+            <div class="nav-buttons-container">
+                <div class="nav-buttons">
+                    <button class="nav-auth-btn" onclick="window.location.href='login.html'">Already a Member?</button>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="login-container">
+        <div class="login-card">
+            <h2>Create Account</h2>
+            <form id="signup-form">
+                <div class="input-group">
+                    <label for="name">Full Name</label>
+                    <input type="text" id="name" required>
+                </div>
+                <div class="input-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" required>
+                </div>
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" required>
+                </div>
+                
+                <div class="checkbox-group">
+                    <input type="checkbox" id="terms-checkbox" required>
+                    <label for="terms-checkbox">I agree to the <a href="#" onclick="openTerms(event)">Terms and Conditions</a></label>
+                </div>
+
+                <button type="submit" class="login-btn">Sign Up</button>
+            </form>
+            <p class="auth-link">Already have an account? <a href="login.html">Log In</a></p>
+        </div>
+    </main>
+
+    <div id="termsModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeTerms()">&times;</span>
+            <h2>Terms and Conditions</h2>
+            <div class="modal-body">
+                <p><strong>1. Introduction</strong><br>
+                Welcome to <strong>Babies Baby Products Trading</strong>! By creating an account, you agree to abide by our shop policies and terms of service.</p>
+                <br>
+                <p><strong>2. Purchases & Orders</strong><br>
+                All artistic merchandise, including badge pins, stickers, keychains, and prints, are subject to availability. We reserve the right to limit quantities.</p>
+                <br>
+                <p><strong>3. User Conduct</strong><br>
+                You agree to provide accurate information when creating an account and placing orders.</p>
+                <br>
+                <p><strong>4. Privacy</strong><br>
+                Your personal information is secure and will solely be used for order processing and communication regarding Babies Baby Products Trading.</p>
+            </div>
+            <button class="accept-btn" onclick="acceptTerms()">I Accept</button>
+        </div>
+    </div>
+
+    <footer class="site-footer">
+        <h3>Babies Baby Products Trading</h3>
+        <p>Join us to shop with ease, save your progress, and enjoy a more thoughtful checkout flow.</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

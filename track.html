@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Track Order - Babies Baby Products Trading</title>
+    <link rel="stylesheet" href="common.css">
+    <link href="https://fonts.googleapis.com/css2?family=Bubblegum+Sans&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <div class="top-bar"></div>
+        <nav class="navbar">
+            <div class="logo-container">
+                <div class="logo">
+                    <a href="index.html">Babies <span>Baby Products Trading</span></a>
+                </div>
+            </div>
+            
+            <div class="nav-links-container">
+                <ul class="nav-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="pages.html">About</a></li>
+                    <li><a href="shop.html">Shop</a></li>
+                </ul>
+            </div>
+            
+            <div class="nav-buttons-container">
+                <div class="nav-buttons">
+                    <button class="nav-auth-btn" onclick="window.location.href='shop.html'">Continue Shopping</button>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container" style="display: flex; justify-content: center; align-items: center; min-height: 60vh; padding: 40px 20px;">
+        <div class="tracking-container form-container" style="background: var(--surface-strong); width: 100%; max-width: 600px; padding: 40px; border-radius: 24px; box-shadow: var(--shadow-soft); border: 1px solid var(--border-soft);">
+            <h2 style="text-align: center; margin-bottom: 20px; color: var(--dark-blue);">Track Your Order</h2>
+            <p style="text-align: center; color: var(--text-muted); margin-bottom: 30px;">Enter your Order ID and Email to see the status of your baby essentials.</p>
+            
+            <form id="tracking-form" onsubmit="simulateTracking(event)">
+                <div class="input-group" style="margin-bottom: 15px;">
+                    <label for="orderId" style="display: block; margin-bottom: 5px; font-weight: bold; color: var(--dark-blue);">Order ID</label>
+                    <input type="text" id="orderId" placeholder="e.g. BBPT-12345" required style="width: 100%; padding: 12px; border: 1px solid var(--border-soft); border-radius: 8px;">
+                </div>
+                <div class="input-group" style="margin-bottom: 25px;">
+                    <label for="trackEmail" style="display: block; margin-bottom: 5px; font-weight: bold; color: var(--dark-blue);">Email Address</label>
+                    <input type="email" id="trackEmail" placeholder="Your email address" required style="width: 100%; padding: 12px; border: 1px solid var(--border-soft); border-radius: 8px;">
+                </div>
+                <button type="submit" class="place-order-btn" style="width: 100%; padding: 14px; border: none; font-size: 16px; cursor: pointer;">Find My Order</button>
+            </form>
+
+            <!-- This is where the JS will inject the timeline -->
+            <div id="tracking-result" style="display: none; margin-top: 40px; text-align: center;"></div>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <h3>Babies Baby Products Trading</h3>
+        <p>Keep an eye on your little one's essentials every step of the way.</p>
+    </footer>
+
+    <!-- The Javascript to make the simulation work -->
+    <script>
+        function simulateTracking(event) {
+            event.preventDefault(); // Prevent page reload
+            const orderId = document.getElementById('orderId').value;
+            const resultDiv = document.getElementById('tracking-result');
+
+            // Show a loading message
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '<p style="color: var(--text-muted);">Searching for order...</p>';
+
+            // Simulate a server delay, then show the timeline
+            setTimeout(() => {
+                resultDiv.innerHTML = `
+                    <h3 style="color: var(--dark-blue); margin-bottom: 25px;">Status for Order: ${orderId}</h3>
+                    <div class="tracking-timeline">
+                        <div class="step active">
+                            <div class="step-icon">📋</div>
+                            <p>Order Placed</p>
+                        </div>
+                        <div class="step active">
+                            <div class="step-icon">📦</div>
+                            <p>Processing</p>
+                        </div>
+                        <div class="step">
+                            <div class="step-icon">🚚</div>
+                            <p>Shipped</p>
+                        </div>
+                        <div class="step">
+                            <div class="step-icon">🏠</div>
+                            <p>Delivered</p>
+                        </div>
+                    </div>
+                `;
+            }, 1000); // 1 second delay
+        }
+    </script>
+</body>
+</html>
