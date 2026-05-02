@@ -4,10 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>About Us - Babies Baby Products Trading</title>
+
     <link rel="stylesheet" href="pagesstyle.css">
     <link rel="stylesheet" href="common.css">
     <link href="https://fonts.googleapis.com/css2?family=Bubblegum+Sans&display=swap" rel="stylesheet">
+
+    <!-- EmailJS SDK (required for GitHub Pages) -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 </head>
+
 <body>
     <header>
         <div class="top-bar"></div>
@@ -17,7 +22,7 @@
                     <a href="index.html">Babies <span>Baby Products Trading</span></a>
                 </div>
             </div>
-            
+
             <div class="nav-links-container">
                 <ul class="nav-links">
                     <li><a href="index.html">Home</a></li>
@@ -25,25 +30,23 @@
                     <li><a href="shop.html">Shop</a></li>
                 </ul>
             </div>
-            
-            <div class="nav-buttons-container">
-                <div class="nav-buttons">
-                </div>
-            </div>
         </nav>
     </header>
 
     <main class="container">
+
         <section class="about-us">
             <h2>About Us</h2>
             <p>
                 Babies Baby Trading Products is dedicated to providing the best products for newborns and toddlers. 
                 Our mission is to offer high-quality baby products that ensure the safety and comfort of your little ones.
             </p>
+
             <p>
                 Our team consists of experienced parents and professionals who understand the needs of both parents and babies. 
                 We carefully select each product to ensure it meets our high standards of quality and safety.
             </p>
+
             <figure>
                 <img src="images/momwithbaby.jpg" alt="Mother interacting with baby">
             </figure>
@@ -57,43 +60,35 @@
         </section>
 
         <section class="contact-section">
+
+            <!-- FORM -->
             <div class="form-container">
                 <h3>Send Us a Message!</h3>
-                <form onsubmit="sendEmail(); return false;">
+
+                <form id="contact-form">
                     <input type="text" id="name" placeholder="Your Name" required>
                     <input type="email" id="email" placeholder="Your Email" required>
                     <input type="text" id="subject" placeholder="Subject" required>
                     <textarea id="message" placeholder="Write a message..." required></textarea>
+
                     <button type="submit">
-                        Submit <img class="submit-icon" src="https://cdn-icons-png.flaticon.com/512/6052/6052390.png" alt="Rocket Icon">
+                        Submit
+                        <img class="submit-icon" src="https://cdn-icons-png.flaticon.com/512/6052/6052390.png" alt="Rocket Icon">
                     </button>
                 </form>
             </div>
 
+            <!-- MAP -->
             <div class="map-container">
                 <h3>Find Us Here</h3>
                 <iframe
                     src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d244.62007208662857!2d120.9207843206993!3d14.732144964739794!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3397b317bd6788eb%3A0x64e98d3159eddbc!2sHome%2C%20834%20Paliwas%20Rd%2C%20Obando%2C%20Bulacan!5e1!3m2!1sen!2sph!4v1776247939764!5m2!1sen!2sph"
-                    width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy"
-                    referrerpolicy="no-referrer-when-downgrade"></iframe>
+                    width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy">
+                </iframe>
             </div>
+
         </section>
 
-        <hr class="section-divider">
-
-        <section class="team-credits" style="text-align: center; margin-bottom: 50px;">
-            <h2>Meet the Developers</h2>
-            <p style="color: #444; line-height: 1.8; max-width: 800px; margin: 10px auto;">
-                This website was proudly created as a collaborative project by:
-            </p>
-            <ul style="list-style: none; padding: 0; display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 20px;">
-                <li style="font-weight: bold; color: black; font-size: 14px;">MARIÑO, NASH E.</li>
-                <li style="font-weight: bold; color: black; font-size: 14px;">NUNEZ, LAHRN RAVEN</li>
-                <li style="font-weight: bold; color: black; font-size: 14px;">PASCUAL, CROMWELL JOHN B.</li>
-                <li style="font-weight: bold; color: black; font-size: 14px;">PERALTA, LEONARD F.</li>
-                <li style="font-weight: bold; color: black; font-size: 14px;">REYES, JORELLE DANIEL A.</li>
-            </ul>
-        </section>
     </main>
 
     <footer class="site-footer">
@@ -101,14 +96,44 @@
         <p>Created with care for parents seeking safe, reliable, and comforting baby essentials.</p>
     </footer>
 
-    <div id="bagSidebar" class="sidebar"></div>
-
-    <script src="script.js"></script>
+    <!-- EMAILJS LOGIC -->
     <script>
-        function sendEmail() {
-            alert("Message sent successfully!");
-            document.querySelector('form').reset();
-        }
+        document.addEventListener("DOMContentLoaded", function () {
+
+            // ✅ YOUR NEW PUBLIC KEY
+            emailjs.init("TxkX1hCSfmYPbG8-s");
+
+            const form = document.getElementById("contact-form");
+
+            form.addEventListener("submit", function (e) {
+                e.preventDefault();
+
+                const params = {
+                    name: document.getElementById("name").value,
+                    email: document.getElementById("email").value,
+                    subject: document.getElementById("subject").value,
+                    message: document.getElementById("message").value
+                };
+
+                emailjs.send(
+                    "service_2uf2eb8",     // ✅ Service ID
+                    "template_e4cij3j",    // ⚠️ Replace this with REAL template ID
+                    params
+                )
+                .then(function (response) {
+                    console.log("SUCCESS:", response);
+                    alert("Message sent successfully!");
+                    form.reset();
+                })
+                .catch(function (error) {
+                    console.log("FAILED:", error);
+                    alert("Failed to send message. Check console.");
+                });
+
+            });
+
+        });
     </script>
+
 </body>
 </html>
