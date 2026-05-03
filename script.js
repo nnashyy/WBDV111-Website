@@ -190,13 +190,21 @@ function closeTerms() {
     const modal = document.getElementById('termsModal');
     if (modal) modal.classList.remove('show');
 }
+function openPrivacy(event) {
+    if (event) event.preventDefault();
+    const modal = document.getElementById('privacyModal');
+    if (modal) modal.classList.add('show');
+}
 
+function closePrivacy() {
+    const modal = document.getElementById('privacyModal');
+    if (modal) modal.classList.remove('show');
+}
 function acceptTerms() {
     const checkbox = document.getElementById('terms-checkbox');
     if (checkbox) checkbox.checked = true;
     closeTerms();
 }
-
 document.addEventListener("click", function (event) {
     const accountBtn = document.querySelector(".account-btn");
     const accountMenu = document.getElementById("account-menu");
@@ -223,7 +231,10 @@ document.addEventListener("click", function (event) {
     if (termsModal && event.target === termsModal) {
         closeTerms();
     }
-
+    const privacyModal = document.getElementById('privacyModal');
+    if (privacyModal && event.target === privacyModal) {
+    closePrivacy();
+    }
     const productModal = document.getElementById('productModal');
     if (productModal && event.target === productModal) {
         productModal.classList.remove('show');
