@@ -108,6 +108,10 @@ function formatCurrency(amount) {
     return `₱${Number(amount || 0).toFixed(2)}`;
 }
 
+function formatPdfCurrency(amount) {
+    return `PHP ${Number(amount || 0).toFixed(2)}`;
+}
+
 function formatOrderDate(dateValue) {
     if (!dateValue) return 'Date unavailable';
 
@@ -125,9 +129,424 @@ function formatOrderDate(dateValue) {
     });
 }
 
+function escapeHtml(value) {
+    return String(value || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
 function parsePrice(value) {
     const numericValue = parseFloat(String(value || '').replace(/[^\d.]/g, ''));
     return Number.isNaN(numericValue) ? 0 : numericValue;
+}
+
+function getOrderId(order) {
+    return order.orderId || 'BBPT-' + new Date(order.datePlaced).getTime().toString().slice(-5);
+}
+
+function getInvoiceNumber(order) {
+    const orderId = getOrderId(order);
+    return order.invoiceNumber || `INV-${orderId.replace(/^BBPT-/, '')}`;
+}
+
+function getInvoiceHtml(order) {
+    const orderId = getOrderId(order);
+    const invoiceNumber = getInvoiceNumber(order);
+    const items = Array.isArray(order.items) ? order.items : [];
+    const subtotal = Number(order.subtotal || items.reduce((sum, item) => sum + Number(item.total || 0), 0));
+    const shippingFee = Number(order.shippingFee || 0);
+    const total = Number(order.total || subtotal + shippingFee);
+    const fullAddress = [order.shippingAddress, order.city, order.zipCode].filter(Boolean).join(', ');
+    const itemRows = items.map(item => `
+        <tr>
+            <td>${escapeHtml(item.name)}</td>
+            <td>${formatPdfCurrency(item.price)}</td>
+            <td>${escapeHtml(item.quantity)}</td>
+            <td>${formatPdfCurrency(item.total)}</td>
+        </tr>
+    `).join('');
+
+    return `
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>Invoice ${escapeHtml(invoiceNumber)}</title>
+            <style>
+                * { box-sizing: border-box; }
+                body {
+                    margin: 0;
+                    padding: 32px;
+                    color: #1b3a57;
+                    font-family: Arial, sans-serif;
+                    background: #ffffff;
+                }
+                .invoice {
+                    max-width: 820px;
+                    margin: 0 auto;
+                    border: 1px solid #d9e9ef;
+                    padding: 34px;
+                }
+                .invoice-header {
+                    display: flex;
+                    justify-content: space-between;
+                    gap: 24px;
+                    border-bottom: 3px solid #48c6c4;
+                    padding-bottom: 22px;
+                    margin-bottom: 24px;
+                }
+                h1, h2, h3, p { margin: 0; }
+                h1 { color: #f973a9; font-size: 30px; }
+                .brand { font-size: 20px; font-weight: 700; margin-bottom: 6px; }
+                .muted { color: #5d7186; line-height: 1.5; }
+                .meta { text-align: right; line-height: 1.7; }
+                .billing {
+                    display: grid;
+                    grid-template-columns: repeat(2, 1fr);
+                    gap: 20px;
+                    margin-bottom: 26px;
+                }
+                .panel {
+                    border: 1px solid #e5f1f4;
+                    padding: 16px;
+                    background: #fdfefe;
+                }
+                .panel h3 { font-size: 15px; margin-bottom: 10px; color: #48c6c4; }
+                table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin-bottom: 24px;
+                }
+                th {
+                    background: #eefbff;
+                    color: #1b3a57;
+                    text-align: left;
+                    padding: 12px;
+                    border-bottom: 1px solid #d9e9ef;
+                }
+                td {
+                    padding: 12px;
+                    border-bottom: 1px solid #eef5f8;
+                    vertical-align: top;
+                }
+                th:nth-child(2), th:nth-child(3), th:nth-child(4),
+                td:nth-child(2), td:nth-child(3), td:nth-child(4) {
+                    text-align: right;
+                    white-space: nowrap;
+                }
+                .totals {
+                    width: 300px;
+                    margin-left: auto;
+                    line-height: 2;
+                }
+                .totals div {
+                    display: flex;
+                    justify-content: space-between;
+                    border-bottom: 1px solid #eef5f8;
+                }
+                .totals .grand-total {
+                    color: #f973a9;
+                    font-weight: 700;
+                    font-size: 18px;
+                    border-bottom: 0;
+                }
+                .thank-you {
+                    margin-top: 32px;
+                    padding-top: 18px;
+                    border-top: 1px solid #d9e9ef;
+                    color: #5d7186;
+                }
+                @media print {
+                    body { padding: 0; }
+                    .invoice { border: 0; }
+                }
+            </style>
+        </head>
+        <body>
+            <main class="invoice">
+                <section class="invoice-header">
+                    <div>
+                        <p class="brand">Babies Baby Products Trading</p>
+                        <p class="muted">Baby essentials, comfort items, and family care products</p>
+                    </div>
+                    <div class="meta">
+                        <h1>Invoice</h1>
+                        <p><strong>${escapeHtml(invoiceNumber)}</strong></p>
+                        <p>Order: ${escapeHtml(orderId)}</p>
+                        <p>${escapeHtml(formatOrderDate(order.datePlaced))}</p>
+                    </div>
+                </section>
+
+                <section class="billing">
+                    <div class="panel">
+                        <h3>Billed To</h3>
+                        <p>${escapeHtml(order.customerName || 'Customer')}</p>
+                        <p class="muted">${escapeHtml(order.customerEmail || '')}</p>
+                    </div>
+                    <div class="panel">
+                        <h3>Shipping Details</h3>
+                        <p>${escapeHtml(fullAddress || 'Address unavailable')}</p>
+                        <p class="muted">Payment: ${escapeHtml(order.paymentMethod || 'Payment unavailable')}</p>
+                    </div>
+                </section>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Price</th>
+                            <th>Qty</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>${itemRows}</tbody>
+                </table>
+
+                <section class="totals">
+                    <div><span>Subtotal</span><strong>${formatPdfCurrency(subtotal)}</strong></div>
+                    <div><span>Shipping</span><strong>${formatPdfCurrency(shippingFee)}</strong></div>
+                    <div class="grand-total"><span>Total</span><strong>${formatPdfCurrency(total)}</strong></div>
+                </section>
+
+                <p class="thank-you">Thank you for shopping with Babies Baby Products Trading.</p>
+            </main>
+        </body>
+        </html>
+    `;
+}
+
+function getInvoiceFileName(order) {
+    return `${getInvoiceNumber(order)}-${getOrderId(order)}.pdf`.replace(/[^a-z0-9_.-]/gi, '-');
+}
+
+function drawInvoicePdf(doc, order) {
+    const orderId = getOrderId(order);
+    const invoiceNumber = getInvoiceNumber(order);
+    const items = Array.isArray(order.items) ? order.items : [];
+    const subtotal = Number(order.subtotal || items.reduce((sum, item) => sum + Number(item.total || 0), 0));
+    const shippingFee = Number(order.shippingFee || 0);
+    const total = Number(order.total || subtotal + shippingFee);
+    const fullAddress = [order.shippingAddress, order.city, order.zipCode].filter(Boolean).join(', ') || 'Address unavailable';
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const margin = 18;
+    let y = 18;
+
+    function addWrappedText(text, x, startY, maxWidth, lineHeight) {
+        const lines = doc.splitTextToSize(String(text || ''), maxWidth);
+        doc.text(lines, x, startY);
+        return startY + (lines.length * lineHeight);
+    }
+
+    function addPageIfNeeded(nextBlockHeight) {
+        if (y + nextBlockHeight <= pageHeight - margin) return;
+        doc.addPage();
+        y = margin;
+    }
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(18);
+    doc.setTextColor(249, 115, 169);
+    doc.text('Babies Baby Products Trading', margin, y);
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    doc.setTextColor(91, 109, 125);
+    doc.text('Baby essentials, comfort items, and family care products', margin, y + 7);
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(22);
+    doc.setTextColor(27, 58, 87);
+    doc.text('INVOICE', pageWidth - margin, y, { align: 'right' });
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    doc.text(invoiceNumber, pageWidth - margin, y + 8, { align: 'right' });
+    doc.text(`Order: ${orderId}`, pageWidth - margin, y + 14, { align: 'right' });
+    doc.text(formatOrderDate(order.datePlaced), pageWidth - margin, y + 20, { align: 'right' });
+
+    y += 30;
+    doc.setDrawColor(72, 198, 196);
+    doc.setLineWidth(0.8);
+    doc.line(margin, y, pageWidth - margin, y);
+    y += 12;
+
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(72, 198, 196);
+    doc.text('Billed To', margin, y);
+    doc.text('Shipping Details', pageWidth / 2 + 6, y);
+
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(27, 58, 87);
+    y += 7;
+    const leftY = addWrappedText(order.customerName || 'Customer', margin, y, 76, 5);
+    doc.setTextColor(91, 109, 125);
+    const emailY = addWrappedText(order.customerEmail || '', margin, leftY, 76, 5);
+
+    doc.setTextColor(27, 58, 87);
+    const rightY = addWrappedText(fullAddress, pageWidth / 2 + 6, y, 76, 5);
+    doc.setTextColor(91, 109, 125);
+    const paymentY = addWrappedText(`Payment: ${order.paymentMethod || 'Payment unavailable'}`, pageWidth / 2 + 6, rightY, 76, 5);
+    y = Math.max(emailY, paymentY) + 8;
+
+    const columns = [
+        { title: 'Item', x: margin, width: 78, align: 'left' },
+        { title: 'Price', x: 112, width: 24, align: 'right' },
+        { title: 'Qty', x: 142, width: 16, align: 'right' },
+        { title: 'Total', x: pageWidth - margin, width: 28, align: 'right' }
+    ];
+
+    addPageIfNeeded(24);
+    doc.setFillColor(238, 251, 255);
+    doc.rect(margin, y, pageWidth - (margin * 2), 10, 'F');
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
+    doc.setTextColor(27, 58, 87);
+    columns.forEach(column => doc.text(column.title, column.x, y + 7, { align: column.align }));
+    y += 14;
+
+    doc.setFont('helvetica', 'normal');
+    items.forEach(item => {
+        const nameLines = doc.splitTextToSize(String(item.name || 'Item'), columns[0].width);
+        const rowHeight = Math.max(10, nameLines.length * 5 + 5);
+        addPageIfNeeded(rowHeight + 4);
+
+        doc.setTextColor(27, 58, 87);
+        doc.text(nameLines, columns[0].x, y);
+        doc.text(formatPdfCurrency(item.price), columns[1].x, y, { align: 'right' });
+        doc.text(String(item.quantity || 0), columns[2].x, y, { align: 'right' });
+        doc.text(formatPdfCurrency(item.total), columns[3].x, y, { align: 'right' });
+
+        y += rowHeight;
+        doc.setDrawColor(238, 245, 248);
+        doc.line(margin, y - 4, pageWidth - margin, y - 4);
+    });
+
+    y += 4;
+    addPageIfNeeded(32);
+    const labelX = pageWidth - 72;
+    const valueX = pageWidth - margin;
+    doc.setFontSize(10);
+    doc.setTextColor(27, 58, 87);
+    doc.text('Subtotal', labelX, y);
+    doc.text(formatPdfCurrency(subtotal), valueX, y, { align: 'right' });
+    y += 7;
+    doc.text('Shipping', labelX, y);
+    doc.text(formatPdfCurrency(shippingFee), valueX, y, { align: 'right' });
+    y += 8;
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(12);
+    doc.setTextColor(249, 115, 169);
+    doc.text('Total', labelX, y);
+    doc.text(formatPdfCurrency(total), valueX, y, { align: 'right' });
+
+    y += 16;
+    doc.setDrawColor(217, 233, 239);
+    doc.line(margin, y, pageWidth - margin, y);
+    y += 8;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    doc.setTextColor(91, 109, 125);
+    doc.text('Thank you for shopping with Babies Baby Products Trading.', margin, y);
+}
+
+function createInvoicePdfDocument(order) {
+    const jsPdfLibrary = window.jspdf && window.jspdf.jsPDF;
+
+    if (!jsPdfLibrary) {
+        return null;
+    }
+
+    const doc = new jsPdfLibrary({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
+    });
+
+    drawInvoicePdf(doc, order);
+    return doc;
+}
+
+function downloadInvoicePdf(order) {
+    const doc = createInvoicePdfDocument(order);
+    if (!doc) return false;
+
+    doc.save(getInvoiceFileName(order));
+    return true;
+}
+
+function previewInvoicePdf(order) {
+    const doc = createInvoicePdfDocument(order);
+    if (!doc) return false;
+
+    const pdfUrl = URL.createObjectURL(doc.output('blob'));
+    const previewWindow = window.open(pdfUrl, '_blank');
+
+    if (!previewWindow) {
+        URL.revokeObjectURL(pdfUrl);
+        return false;
+    }
+
+    return true;
+}
+
+function openPrintableInvoice(order) {
+    const invoiceWindow = window.open('', '_blank', 'width=900,height=700');
+    if (!invoiceWindow) return false;
+
+    invoiceWindow.document.open();
+    invoiceWindow.document.write(getInvoiceHtml(order));
+    invoiceWindow.document.close();
+    invoiceWindow.focus();
+    setTimeout(function() {
+        invoiceWindow.print();
+    }, 300);
+    return true;
+}
+
+function generateInvoicePdf(orderId) {
+    const order = getStoredOrders().find(storedOrder => getOrderId(storedOrder) === orderId);
+    if (!order) {
+        alert('Invoice details could not be found for this order.');
+        return;
+    }
+
+    if (!downloadInvoicePdf(order) && !openPrintableInvoice(order)) {
+        alert('Invoice could not be opened. Please allow pop-ups or check your connection and try again.');
+        return;
+    }
+}
+
+function previewInvoicePdfById(orderId) {
+    const order = getStoredOrders().find(storedOrder => getOrderId(storedOrder) === orderId);
+    if (!order) {
+        alert('Invoice details could not be found for this order.');
+        return;
+    }
+
+    if (!previewInvoicePdf(order) && !openPrintableInvoice(order)) {
+        alert('Invoice preview could not be opened. Please allow pop-ups or check your connection and try again.');
+    }
+}
+
+function downloadInvoicePdfById(orderId) {
+    const order = getStoredOrders().find(storedOrder => getOrderId(storedOrder) === orderId);
+    if (!order) {
+        alert('Invoice details could not be found for this order.');
+        return;
+    }
+
+    if (!downloadInvoicePdf(order) && !openPrintableInvoice(order)) {
+        alert('Invoice download could not be started. Please allow pop-ups or check your connection and try again.');
+    }
+}
+
+function generateInvoicePdfFromOrder(order) {
+    return previewInvoicePdf(order) || openPrintableInvoice(order);
 }
 
 function renderOrders() {
@@ -149,7 +568,7 @@ function renderOrders() {
                 .map(item => `
                     <div class="order-item">
                         <div class="order-item-details">
-                            <div class="order-item-name">${item.name}</div>
+                            <div class="order-item-name">${escapeHtml(item.name)}</div>
                             <div class="order-item-meta">${formatCurrency(item.price)} each | Qty ${item.quantity}</div>
                         </div>
                         <div class="order-item-total">${formatCurrency(item.total)}</div>
@@ -157,23 +576,28 @@ function renderOrders() {
                 `)
                 .join('');
             
-            const orderId = order.orderId || 'BBPT-' + new Date(order.datePlaced).getTime().toString().slice(-5);
+            const orderId = getOrderId(order);
 
             return `
                 <div class="order-card">
                     <div class="order-card-header">
                         <div>
                             <h3 style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
-                                Order: ${orderId}
+                                Order: ${escapeHtml(orderId)}
                                 <button class="copy-id-btn" onclick="copyOrderId('${orderId}')" title="Copy Order ID">📋</button>
                             </h3>
-                            <div class="order-meta">Customer: ${order.customerName}</div>
+                            <div class="order-meta">Invoice: ${escapeHtml(getInvoiceNumber(order))}</div>
+                            <div class="order-meta">Customer: ${escapeHtml(order.customerName)}</div>
                             <div class="order-meta">Date: ${formatOrderDate(order.datePlaced)}</div>
-                            <div class="order-meta">Payment: ${order.paymentMethod}</div>
+                            <div class="order-meta">Payment: ${escapeHtml(order.paymentMethod)}</div>
                         </div>
                         <div class="order-total">${formatCurrency(order.total)}</div>
                     </div>
                     <div class="order-items">${itemsMarkup}</div>
+                    <div class="order-actions">
+                        <button type="button" class="invoice-btn invoice-preview-btn" onclick="previewInvoicePdfById('${orderId}')">Preview PDF</button>
+                        <button type="button" class="invoice-btn" onclick="downloadInvoicePdfById('${orderId}')">Download PDF</button>
+                    </div>
                 </div>
             `;
         })
@@ -364,8 +788,10 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
         const orders = getStoredOrders();
-        orders.push({
-            orderId: 'BBPT-' + Math.floor(10000 + Math.random() * 90000),
+        const orderId = 'BBPT-' + Math.floor(10000 + Math.random() * 90000);
+        const newOrder = {
+            orderId,
+            invoiceNumber: `INV-${orderId.replace(/^BBPT-/, '')}`,
             customerName: document.getElementById('fname')?.value.trim() || 'Customer',
             customerEmail: checkoutEmail || getCurrentUserEmail(),
             shippingAddress: document.getElementById('address')?.value.trim() || '',
@@ -377,11 +803,15 @@ document.addEventListener('DOMContentLoaded', function () {
             shippingFee,
             total: subtotal + shippingFee,
             items: orderItems
-        });
+        };
 
+        orders.push(newOrder);
         saveStoredOrders(orders);
         localStorage.removeItem('userCart');
-        alert('Order placed successfully!');
+        const invoicePreviewOpened = generateInvoicePdfFromOrder(newOrder);
+        alert(invoicePreviewOpened
+            ? 'Order placed successfully! Your invoice preview is open, and you can download it from My Orders.'
+            : 'Order placed successfully! You can preview or download the invoice PDF from My Orders.');
         window.location.href = 'shop.html';
     }
 
