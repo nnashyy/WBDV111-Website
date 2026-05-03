@@ -1,5 +1,6 @@
 :root {
     --primary-blue: #48C6C4;
+    --primary-blue-deep: #2aa7a5;
     --dark-blue: #1B3A57;
     --pink: #F973A9;
     --white: #ffffff;
@@ -443,6 +444,40 @@ header {
     gap: 10px;
 }
 
+.order-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    margin-top: 16px;
+}
+
+.invoice-btn {
+    border: none;
+    border-radius: 999px;
+    background: var(--primary-blue);
+    color: white;
+    padding: 10px 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+}
+
+.invoice-btn:hover {
+    background: var(--primary-blue-deep);
+    transform: translateY(-1px);
+}
+
+.invoice-preview-btn {
+    background: var(--white);
+    border: 2px solid var(--primary-blue);
+    color: var(--dark-blue);
+}
+
+.invoice-preview-btn:hover {
+    background: #eefbff;
+}
+
 .order-item {
     display: flex;
     justify-content: space-between;
@@ -593,6 +628,14 @@ header {
     .order-total,
     .order-item-total {
         white-space: normal;
+    }
+
+    .order-actions {
+        justify-content: stretch;
+    }
+
+    .invoice-btn {
+        width: 100%;
     }
 }
 
